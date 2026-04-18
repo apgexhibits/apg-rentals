@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<!-- saved from url=(0065)file:///Users/matthewbaron/Downloads/apg_rentals_dashboard_2.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APG Rentals — Owner Dashboard</title>
+<link href="./APG Rentals — Owner Dashboard_files/css2" rel="stylesheet">
+<script src="./APG Rentals — Owner Dashboard_files/chart.umd.js"></script>
+<style>
+:root{
+  --navy:#0f1f30;--navy2:#162840;--navy3:#1e3a54;
+  --teal:#1e8a96;--teal2:#26a8b6;--teal3:#e0f5f7;
+  --sand:#f5f0e8;--sand2:#ebe2d4;
+  --white:#fff;--ink:#0f1f30;--ink2:#3a5068;--ink3:#7a92a8;
+  --green:#1e7a48;--green-lt:#e8f5ee;
+  --amber:#b8860b;--amber-lt:#fdf8e6;
+  --red:#c0392b;--red-lt:#fdf0ee;
+  --blue-lt:#e8f1fb;
+  --border:#e2e8ef;
+  --sidebar:230px;
+  --radius:10px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:#f0f4f7;color:var(--ink);font-size:14px}
+a{text-decoration:none;color:inherit}
+
+/* LAYOUT */
+.layout{display:flex;min-height:100vh}
+.sidebar{width:var(--sidebar);background:var(--navy);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;overflow-y:auto}
+.main{margin-left:var(--sidebar);flex:1;display:flex;flex-direction:column}
+
+/* SIDEBAR */
+.sb-brand{padding:20px 16px 16px;border-bottom:1px solid rgba(255,255,255,.07)}
+.sb-logo{display:flex;align-items:center;gap:10px}
+.sb-mark{width:34px;height:34px;background:var(--teal);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-mark svg{width:20px;height:20px}
+.sb-title{color:#fff;font-family:'Playfair Display',serif;font-size:1rem;font-weight:600;line-height:1.2}
+.sb-sub{color:rgba(255,255,255,.38);font-size:.65rem;letter-spacing:.08em;text-transform:uppercase}
+.sb-section{padding:16px 16px 6px;font-size:.63rem;font-weight:600;color:rgba(255,255,255,.3);letter-spacing:.1em;text-transform:uppercase}
+.sb-item{display:flex;align-items:center;gap:9px;padding:9px 14px;margin:1px 8px;border-radius:7px;cursor:pointer;color:rgba(255,255,255,.55);font-size:.85rem;transition:all .15s}
+.sb-item:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.9)}
+.sb-item.active{background:rgba(30,138,150,.2);color:#7dd8e0;font-weight:500}
+.sb-item svg{width:15px;height:15px;flex-shrink:0;opacity:.7}
+.sb-item.active svg{opacity:1}
+.sb-spacer{flex:1}
+.sb-prop{margin:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);border-radius:9px;padding:12px}
+.sb-prop-lbl{font-size:.63rem;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
+.sb-prop-name{color:#fff;font-weight:500;font-size:.85rem}
+.sb-prop-status{display:flex;align-items:center;gap:5px;font-size:.72rem;color:#7dd8e0;margin-top:5px}
+.sb-prop-status::before{content:'';width:6px;height:6px;border-radius:50%;background:#7dd8e0;flex-shrink:0}
+
+/* TOPBAR */
+.topbar{background:#fff;height:58px;padding:0 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50}
+.topbar-title{font-size:.95rem;font-weight:500}
+.topbar-right{display:flex;gap:10px;align-items:center}
+.tbtn{padding:7px 14px;border-radius:var(--radius);font-size:.82rem;font-weight:500;cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif;border:none}
+.tbtn-primary{background:var(--navy);color:#fff}
+.tbtn-primary:hover{background:var(--teal)}
+.tbtn-ghost{background:none;border:1px solid var(--border);color:var(--ink2)}
+.tbtn-ghost:hover{border-color:var(--teal);color:var(--teal)}
+
+/* CONTENT */
+.content{padding:24px 28px;flex:1}
+.panel{display:none}
+.panel.active{display:block}
+
+/* STAT CARDS */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.stat-card{background:#fff;border-radius:var(--radius);padding:18px 20px;border:1px solid var(--border);position:relative;overflow:hidden;cursor:pointer;transition:box-shadow .15s}
+.stat-card:hover{box-shadow:0 4px 16px rgba(15,31,48,.08)}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--radius) var(--radius) 0 0}
+.stat-card.blue::before{background:linear-gradient(90deg,var(--navy),var(--teal))}
+.stat-card.green::before{background:linear-gradient(90deg,#1e7a48,#34a85a)}
+.stat-card.amber::before{background:linear-gradient(90deg,#b8860b,#e0a820)}
+.stat-card.red::before{background:linear-gradient(90deg,#c0392b,#e05d50)}
+.stat-lbl{font-size:.72rem;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px}
+.stat-val{font-family:'Playfair Display',serif;font-size:1.9rem;font-weight:700;color:var(--ink);line-height:1}
+.stat-sub{font-size:.75rem;color:var(--ink3);margin-top:5px}
+.stat-delta{font-size:.75rem;margin-top:4px}
+.delta-up{color:var(--green)}
+.delta-dn{color:var(--red)}
+
+/* GRID LAYOUTS */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
+.grid-3-1{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:16px;margin-bottom:16px}
+
+/* CARDS */
+.card{background:#fff;border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;margin-bottom:16px}
+.card-last{margin-bottom:0}
+.card-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-head h3{font-family:'Playfair Display',serif;font-size:1rem;font-weight:600}
+.card-body{padding:18px}
+.card-action{font-size:.8rem;color:var(--teal);cursor:pointer;font-weight:500}
+.card-action:hover{text-decoration:underline}
+
+/* SLIDERS */
+.slider-section{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.sl-row{margin-bottom:14px}
+.sl-row:last-child{margin-bottom:0}
+.sl-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
+.sl-name{font-size:.82rem;color:var(--ink2)}
+.sl-val{font-size:.88rem;font-weight:600;color:var(--ink);background:var(--sand);padding:2px 9px;border-radius:5px;min-width:72px;text-align:center}
+input[type=range]{width:100%;height:4px;-webkit-appearance:none;background:var(--sand2);border-radius:2px;outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--navy);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+input[type=range]::-webkit-slider-thumb:hover{background:var(--teal)}
+
+/* RESULTS */
+.result-stack{display:flex;flex-direction:column;gap:0}
+.rrow{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:.88rem}
+.rrow:last-child{border-bottom:none}
+.rrow.total{padding-top:12px;margin-top:4px;border-top:2px solid var(--border);border-bottom:none;font-weight:600}
+.rrow.total .rval{font-size:1.1rem;font-family:'Playfair Display',serif}
+.rlbl{color:var(--ink2)}
+.rval{font-weight:500;color:var(--ink)}
+.rval.green{color:var(--green)}
+.rval.red{color:var(--red)}
+.rval.amber{color:var(--amber)}
+.rval.blue{color:var(--teal)}
+
+/* PROGRESS */
+.prog-wrap{margin-bottom:16px}
+.prog-head{display:flex;justify-content:space-between;font-size:.82rem;color:var(--ink2);margin-bottom:7px}
+.prog-head span:last-child{font-weight:600;color:var(--ink)}
+.prog-track{height:22px;background:var(--sand2);border-radius:4px;overflow:hidden}
+.prog-fill{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:10px;font-size:.72rem;font-weight:600;color:#fff;transition:width .4s;white-space:nowrap;overflow:hidden}
+
+/* YEAR TABLE */
+.yr-table{width:100%;border-collapse:collapse;font-size:.82rem}
+.yr-table thead th{padding:8px 12px;background:var(--sand);text-align:right;font-weight:600;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--ink3);border-bottom:2px solid var(--border)}
+.yr-table thead th:first-child{text-align:left}
+.yr-table tbody td{padding:9px 12px;text-align:right;border-bottom:1px solid var(--border)}
+.yr-table tbody td:first-child{text-align:left;font-weight:500;color:var(--ink2)}
+.yr-table tbody tr:hover td{background:var(--sand)}
+.yr-table tbody tr.payback td{background:var(--green-lt);color:var(--green);font-weight:600}
+.yr-table tbody tr.payback td:first-child{color:var(--green)}
+.neg{color:var(--red)!important}
+.pos{color:var(--green)!important}
+
+/* CALENDAR */
+.cal-nav{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border)}
+.cal-month{font-size:1rem;font-weight:500}
+.cal-arrows{display:flex;gap:6px}
+.cal-arr{width:30px;height:30px;border:1px solid var(--border);background:none;border-radius:6px;cursor:pointer;font-size:14px;color:var(--ink2);display:flex;align-items:center;justify-content:center;transition:all .15s}
+.cal-arr:hover{border-color:var(--teal);color:var(--teal)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);border-top:1px solid var(--border)}
+.cal-dh{padding:8px 4px;text-align:center;font-size:.7rem;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.05em;border-right:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--sand)}
+.cal-dh:last-child{border-right:none}
+.cal-dc{min-height:78px;padding:5px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);cursor:pointer;background:#fff;transition:background .1s;position:relative}
+.cal-dc:nth-child(7n){border-right:none}
+.cal-dc:hover{background:var(--sand)}
+.cal-dc.other{background:#fafafa;opacity:.4;pointer-events:none}
+.cal-dc.today .cal-dn{background:var(--navy);color:#fff;border-radius:50%}
+.cal-dc.has-personal{background:rgba(139,92,246,.06)}
+.cal-dn{width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:500;margin-bottom:2px}
+.cal-rate{font-size:.68rem;font-weight:600;padding:1px 4px;border-radius:3px;display:inline-block;margin-bottom:2px}
+.rate-peak{background:#EAF3DE;color:#27500A}
+.rate-summer{background:#E6F1FB;color:#0C447C}
+.rate-off{background:var(--sand);color:var(--ink3)}
+.cal-ev{font-size:.67rem;font-weight:500;padding:2px 4px;border-radius:3px;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff;display:block}
+.ev-rental{background:#1a73e8}
+.ev-personal{background:#8B5CF6}
+.ev-show{background:#b8860b}
+.ev-reno{background:#5F5E5A}
+.cal-legend{padding:12px 18px;display:flex;gap:14px;flex-wrap:wrap;border-top:1px solid var(--border)}
+.leg{display:flex;align-items:center;gap:5px;font-size:.75rem;color:var(--ink3)}
+.leg-sq{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+
+/* LOCK */
+.lock-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.code-box{background:var(--sand);border-radius:8px;padding:12px}
+.code-lbl{font-size:.68rem;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.code-val{font-size:1.3rem;font-weight:600;letter-spacing:.15em;color:var(--ink);font-family:'DM Sans',monospace}
+.code-exp{font-size:.72rem;color:var(--ink3);margin-top:3px}
+.lock-btns{display:flex;gap:8px}
+.lock-btn{flex:1;padding:8px;border:1px solid var(--border);background:none;border-radius:8px;font-size:.78rem;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--ink2);transition:all .15s}
+.lock-btn:hover{border-color:var(--teal);color:var(--teal);background:var(--teal3)}
+.lock-live{display:inline-flex;align-items:center;gap:5px;font-size:.72rem;color:var(--green);background:var(--green-lt);padding:3px 9px;border-radius:4px}
+.lock-live::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* BOOKING LIST */
+.bk-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s}
+.bk-item:last-child{border-bottom:none}
+.bk-item:hover{background:var(--sand);margin:0 -18px;padding:11px 18px}
+.bk-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.bk-info{flex:1}
+.bk-name{font-weight:500;font-size:.88rem}
+.bk-meta{font-size:.75rem;color:var(--ink3);margin-top:2px}
+.bk-right{text-align:right}
+.bk-amt{font-weight:600;font-size:.9rem}
+.bk-badge{font-size:.68rem;padding:2px 7px;border-radius:4px;margin-top:2px;display:inline-block;text-transform:uppercase;letter-spacing:.04em;font-weight:600}
+.badge-confirmed{background:var(--green-lt);color:var(--green)}
+.badge-personal{background:#EEEDFE;color:#3C3489}
+.badge-pending{background:var(--amber-lt);color:var(--amber)}
+.badge-blocked{background:var(--red-lt);color:var(--red)}
+
+/* VACASA COMPARE */
+.vc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.vc-card{border-radius:var(--radius);padding:16px;border:1px solid var(--border)}
+.vc-head{font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
+.vc-val{font-size:1.5rem;font-weight:700;font-family:'Playfair Display',serif;margin-bottom:4px}
+.vc-sub{font-size:.75rem;line-height:1.5}
+.vc-bad{background:var(--red-lt);border-color:#f5c6c3}.vc-bad .vc-head{color:var(--red)}.vc-bad .vc-val{color:var(--red)}.vc-bad .vc-sub{color:var(--red)}
+.vc-mid{background:var(--sand)}.vc-mid .vc-head{color:var(--ink3)}.vc-mid .vc-val{color:var(--ink)}.vc-mid .vc-sub{color:var(--ink3)}
+.vc-good{background:var(--green-lt);border-color:#a8d5be}.vc-good .vc-head{color:var(--green)}.vc-good .vc-val{color:var(--green)}.vc-good .vc-sub{color:var(--green)}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:999;display:none}
+.modal-bg.open{display:flex}
+.modal{background:#fff;border-radius:12px;padding:24px;width:360px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.modal h3{font-family:'Playfair Display',serif;font-size:1.1rem;margin-bottom:16px}
+.form-row{margin-bottom:12px}
+.form-row label{display:block;font-size:.75rem;font-weight:600;color:var(--ink2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.form-row input,.form-row select,.form-row textarea{width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:.88rem;color:var(--ink);background:#fff;outline:none;transition:border-color .15s}
+.form-row input:focus,.form-row select:focus{border-color:var(--teal)}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.mbtn{padding:8px 16px;border-radius:7px;font-size:.85rem;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif}
+.mbtn-cancel{background:none;border:1px solid var(--border);color:var(--ink2)}
+.mbtn-save{background:var(--navy);color:#fff;border:none}
+.mbtn-save:hover{background:var(--teal)}
+.mbtn-del{background:none;border:1px solid #f5c6c3;color:var(--red)}
+.mbtn-del:hover{background:var(--red-lt)}
+
+/* CHART */
+.chart-wrap{position:relative;height:200px;margin-top:8px}
+
+/* INFO BOX */
+.info-box{background:var(--teal3);border-left:3px solid var(--teal);border-radius:0 7px 7px 0;padding:10px 14px;margin-bottom:14px;font-size:.85rem;color:var(--ink2);line-height:1.5}
+.info-box strong{color:var(--ink)}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .sidebar{display:none}
+  .main{margin-left:0}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .grid-2,.slider-section{grid-template-columns:1fr}
+  .grid-3,.vc-grid{grid-template-columns:1fr}
+  .lock-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo">
+      <div class="sb-mark">
+        <svg viewBox="0 0 22 22" fill="none">
+          <path d="M3 15 C6 8 10 11 14 8 C17 6 19 9 19 9" stroke="white" stroke-width="2" stroke-linecap="round"></path>
+          <path d="M3 18 C7 14 10 16 14 14 C17 12 19 14 19 14" stroke="rgba(255,255,255,.45)" stroke-width="1.5" stroke-linecap="round"></path>
+          <circle cx="14" cy="5" r="2.5" fill="rgba(255,255,255,.9)"></circle>
+        </svg>
+      </div>
+      <div>
+        <div class="sb-title">APG Rentals</div>
+        <div class="sb-sub">Owner Portal</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sb-section">Overview</div>
+  <div class="sb-item" onclick="showPanel(&#39;dashboard&#39;)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect></svg>
+    Dashboard
+  </div>
+  <div class="sb-item" onclick="showPanel(&#39;model&#39;)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"></path></svg>
+    Financial Model
+  </div>
+  <div class="sb-item" onclick="showPanel(&#39;calendar&#39;)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+    Calendar
+  </div>
+  <div class="sb-item active" onclick="showPanel(&#39;bookings&#39;)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+    Bookings
+  </div>
+  <div class="sb-section">Operations</div>
+  <div class="sb-item" onclick="showPanel(&#39;lock&#39;)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0110 0v4"></path></svg>
+    Smart Lock
+  </div>
+  <div class="sb-item" onclick="showPanel(&#39;compare&#39;)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+    Vacasa vs APG
+  </div>
+
+  <div class="sb-spacer"></div>
+  <div class="sb-prop">
+    <div class="sb-prop-lbl">Active property</div>
+    <div class="sb-prop-name">Thunder Island #1030B</div>
+    <div class="sb-prop-status">Live · Accepting bookings</div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <span class="topbar-title" id="topbar-title">All Bookings</span>
+    <div class="topbar-right">
+      <button class="tbtn tbtn-ghost" onclick="window.open(&#39;apg_rentals_landing.html&#39;)">View Guest Page</button>
+      <button class="tbtn tbtn-primary" onclick="openModal(null,&#39;rental&#39;)">+ Add Booking</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+  <!-- DASHBOARD -->
+  <div class="panel" id="panel-dashboard">
+    <div class="stat-grid">
+      <div class="stat-card blue" onclick="showPanel(&#39;model&#39;)">
+        <div class="stat-lbl">Annual revenue target</div>
+        <div class="stat-val" id="dash-rev">$57,260</div>
+        <div class="stat-sub">26 rental weeks</div>
+        <div class="stat-delta delta-up">↑ vs Vacasa $12,437 avg</div>
+      </div>
+      <div class="stat-card green" onclick="showPanel(&#39;model&#39;)">
+        <div class="stat-lbl">Annual net profit</div>
+        <div class="stat-val" id="dash-profit">$22,088</div>
+        <div class="stat-sub">After all costs, Year 2+</div>
+        <div class="stat-delta delta-up">↑ Cash payback: Yr 5–6</div>
+      </div>
+      <div class="stat-card amber" onclick="showPanel(&#39;model&#39;)">
+        <div class="stat-lbl">Monthly nut</div>
+        <div class="stat-val" id="dash-monthly">$2,931</div>
+        <div class="stat-sub">Mortgage + HOA + taxes + ins</div>
+        <div class="stat-delta">Need 6 rental nights to cover</div>
+      </div>
+      <div class="stat-card red" onclick="showPanel(&#39;model&#39;)">
+        <div class="stat-lbl">Cash-on-cash ROI</div>
+        <div class="stat-val" id="dash-coc">23.6%</div>
+        <div class="stat-sub">Year 2+ fully loaded</div>
+        <div class="stat-delta delta-up">↑ Scott's model: 28.8% IRR</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card card-last">
+        <div class="card-head"><h3>Upcoming bookings</h3><span class="card-action" onclick="showPanel(&#39;bookings&#39;)">View all</span></div>
+        <div class="card-body">
+          <div class="bk-item" onclick="showPanel(&#39;bookings&#39;)">
+            <div class="bk-dot" style="background:#1a73e8"></div>
+            <div class="bk-info"><div class="bk-name">Business Traveler</div><div class="bk-meta">Apr 18–24 · Airbnb · 6 nights</div></div>
+            <div class="bk-right"><div class="bk-amt">$1,458</div><span class="bk-badge badge-confirmed">Confirmed</span></div>
+          </div>
+          <div class="bk-item" onclick="showPanel(&#39;bookings&#39;)">
+            <div class="bk-dot" style="background:#b8860b"></div>
+            <div class="bk-info"><div class="bk-name">Springfest Guests</div><div class="bk-meta">Apr 23–26 · Direct · Convention rate</div></div>
+            <div class="bk-right"><div class="bk-amt">$1,890</div><span class="bk-badge badge-pending">Pending</span></div>
+          </div>
+          <div class="bk-item" onclick="showPanel(&#39;bookings&#39;)">
+            <div class="bk-dot" style="background:#8B5CF6"></div>
+            <div class="bk-info"><div class="bk-name">Family — July 7–14</div><div class="bk-meta">Jul 7–14 · Personal use · $3,600 saved</div></div>
+            <div class="bk-right"><div class="bk-amt">—</div><span class="bk-badge badge-personal">Personal</span></div>
+          </div>
+          <div class="bk-item" onclick="showPanel(&#39;bookings&#39;)">
+            <div class="bk-dot" style="background:#1a73e8"></div>
+            <div class="bk-info"><div class="bk-name">Cruisin' OC Weekend</div><div class="bk-meta">May 1–4 · VRBO · Premium rate</div></div>
+            <div class="bk-right"><div class="bk-amt">$2,100</div><span class="bk-badge badge-confirmed">Confirmed</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card card-last">
+        <div class="card-head"><h3>Revenue by month</h3></div>
+        <div class="card-body">
+          <div class="chart-wrap">
+            <canvas id="revChart" role="img" aria-label="Monthly revenue bar chart showing peak in July and August" width="1134" height="400" style="display: block; box-sizing: border-box; height: 200px; width: 567px;">Monthly revenue peaks July–August at $9,000+</canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FINANCIAL MODEL -->
+  <div class="panel" id="panel-model">
+    <div class="info-box"><strong>All numbers update instantly.</strong> Drag any slider and every figure recalculates live — revenue, profit, payback timeline, and ROI.</div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-head"><h3>Deal parameters</h3></div>
+        <div class="card-body">
+          <div class="slider-section" style="grid-template-columns:1fr">
+            <div>
+              <div class="sl-row">
+                <div class="sl-label"><span class="sl-name">Purchase price</span><span class="sl-val" id="lv-price">$345,000</span></div>
+                <input type="range" min="325000" max="390000" step="5000" value="350000" id="s-price" oninput="calc()">
+              </div>
+              <div class="sl-row">
+                <div class="sl-label"><span class="sl-name">Down payment</span><span class="sl-val" id="lv-down">20%</span></div>
+                <input type="range" min="15" max="30" step="5" value="20" id="s-down" oninput="calc()">
+              </div>
+              <div class="sl-row">
+                <div class="sl-label"><span class="sl-name">Interest rate</span><span class="sl-val" id="lv-rate">6.9%</span></div>
+                <input type="range" min="60" max="85" step="1" value="69" id="s-rate" oninput="calc()">
+              </div>
+              <div class="sl-row">
+                <div class="sl-label"><span class="sl-name">HOA / month</span><span class="sl-val" id="lv-hoa">$450</span></div>
+                <input type="range" min="300" max="700" step="10" value="448" id="s-hoa" oninput="calc()">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>Revenue parameters</h3></div>
+        <div class="card-body">
+          <div class="sl-row">
+            <div class="sl-label"><span class="sl-name">Convention weeks (rate/night)</span><span class="sl-val" id="lv-conv-wks">8 wks · $450</span></div>
+            <input type="range" min="0" max="16" step="1" value="8" id="s-conv-wks" oninput="calc()">
+          </div>
+          <div class="sl-row">
+            <div class="sl-label"><span class="sl-name">Convention rate / night</span><span class="sl-val" id="lv-conv-rate">$450</span></div>
+            <input type="range" min="300" max="650" step="10" value="450" id="s-conv-rate" oninput="calc()">
+          </div>
+          <div class="sl-row">
+            <div class="sl-label"><span class="sl-name">Summer weeks (rate/night)</span><span class="sl-val" id="lv-sum-wks">10 wks · $310</span></div>
+            <input type="range" min="0" max="16" step="1" value="10" id="s-sum-wks" oninput="calc()">
+          </div>
+          <div class="sl-row">
+            <div class="sl-label"><span class="sl-name">Summer rate / night</span><span class="sl-val" id="lv-sum-rate">$310</span></div>
+            <input type="range" min="180" max="500" step="10" value="310" id="s-sum-rate" oninput="calc()">
+          </div>
+          <div class="sl-row">
+            <div class="sl-label"><span class="sl-name">Off-peak weeks (rate/night)</span><span class="sl-val" id="lv-off-wks">8 wks · $185</span></div>
+            <input type="range" min="0" max="16" step="1" value="8" id="s-off-wks" oninput="calc()">
+          </div>
+          <div class="sl-row">
+            <div class="sl-label"><span class="sl-name">Off-peak rate / night</span><span class="sl-val" id="lv-off-rate">$185</span></div>
+            <input type="range" min="100" max="300" step="5" value="185" id="s-off-rate" oninput="calc()">
+          </div>
+          <div class="sl-row">
+            <div class="sl-label"><span class="sl-name">Personal use weeks</span><span class="sl-val" id="lv-pu">8 wks</span></div>
+            <input type="range" min="0" max="20" step="1" value="8" id="s-pu" oninput="calc()">
+          </div>
+          <div class="sl-row">
+            <div class="sl-label"><span class="sl-name">Year 1 renovation budget</span><span class="sl-val" id="lv-reno">$16,000</span></div>
+            <input type="range" min="0" max="30000" step="1000" value="16000" id="s-reno" oninput="calc()">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-head"><h3>Full cost stack</h3></div>
+        <div class="card-body">
+          <div class="result-stack">
+            <div class="rrow"><span class="rlbl">Purchase price</span><span class="rval" id="r-price">$345,000</span></div>
+            <div class="rrow"><span class="rlbl">Down payment</span><span class="rval" id="r-down">$69,000</span></div>
+            <div class="rrow"><span class="rlbl">Closing costs (2.5%)</span><span class="rval red" id="r-close">$8,625</span></div>
+            <div class="rrow"><span class="rlbl">Renovation budget</span><span class="rval red" id="r-reno">$16,000</span></div>
+            <div class="rrow total"><span class="rlbl">Cash needed day 1</span><span class="rval blue" id="r-cashin">$93,625</span></div>
+            <div class="rrow" style="margin-top:8px"><span class="rlbl">Mortgage P+I / mo</span><span class="rval red" id="r-mort">$1,818</span></div>
+            <div class="rrow"><span class="rlbl">HOA / mo</span><span class="rval red" id="r-hoa">$450</span></div>
+            <div class="rrow"><span class="rlbl">Taxes + insurance / mo</span><span class="rval red">$667</span></div>
+            <div class="rrow total"><span class="rlbl">Monthly nut</span><span class="rval red" id="r-monthly">$2,931</span></div>
+            <div class="rrow" style="margin-top:8px"><span class="rlbl">Annual hold cost</span><span class="rval red" id="r-annual">$35,172</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>Revenue &amp; profit</h3></div>
+        <div class="card-body">
+          <div class="result-stack">
+            <div class="rrow"><span class="rlbl">Convention weeks revenue</span><span class="rval green" id="r-conv-rev">$25,200</span></div>
+            <div class="rrow"><span class="rlbl">Summer weeks revenue</span><span class="rval green" id="r-sum-rev">$21,700</span></div>
+            <div class="rrow"><span class="rlbl">Off-peak weeks revenue</span><span class="rval green" id="r-off-rev">$10,360</span></div>
+            <div class="rrow total"><span class="rlbl">Gross annual revenue</span><span class="rval green" id="r-gross">$57,260</span></div>
+            <div class="rrow" style="margin-top:8px"><span class="rlbl">Less: annual hold cost</span><span class="rval red" id="r-less-fixed">$35,172</span></div>
+            <div class="rrow"><span class="rlbl">Less: renovation (Yr 1)</span><span class="rval red" id="r-less-reno">$16,000</span></div>
+            <div class="rrow total"><span class="rlbl">Year 1 net profit</span><span class="rval green" id="r-yr1-profit">$6,088</span></div>
+            <div class="rrow"><span class="rlbl">Year 2+ net profit</span><span class="rval green" id="r-yr2-profit">$22,088</span></div>
+            <div class="rrow"><span class="rlbl">Cash-on-cash ROI (Yr 2)</span><span class="rval green" id="r-coc">23.6%</span></div>
+            <div class="rrow total"><span class="rlbl">Cash payback year</span><span class="rval blue" id="r-payback">Year 5</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h3>Cash recovery — how many years to get $<span id="pb-cashin-label">93,625</span> back?</h3></div>
+      <div class="card-body">
+        <div id="pb-bars"><div class="prog-wrap">
+      <div class="prog-head"><span>Year 1</span><span style="color:#c0392b">7% — $87,537 to recover</span></div>
+      <div class="prog-track"><div class="prog-fill" style="width:7%;background:#c0392b"></div></div>
+    </div><div class="prog-wrap">
+      <div class="prog-head"><span>Year 2</span><span style="color:#b8860b">31% — $64,370 to recover</span></div>
+      <div class="prog-track"><div class="prog-fill" style="width:31%;background:#b8860b">$29,255 of $93,625</div></div>
+    </div><div class="prog-wrap">
+      <div class="prog-head"><span>Year 3</span><span style="color:#b8860b">57% — $40,090 to recover</span></div>
+      <div class="prog-track"><div class="prog-fill" style="width:57%;background:#b8860b">$53,535 of $93,625</div></div>
+    </div><div class="prog-wrap">
+      <div class="prog-head"><span>Year 4</span><span style="color:#1e8a96">84% — $14,665 to recover</span></div>
+      <div class="prog-track"><div class="prog-fill" style="width:84%;background:#1e8a96">$78,960 of $93,625</div></div>
+    </div><div class="prog-wrap">
+      <div class="prog-head"><span>Year 5</span><span style="color:#1e7a48">100% — $11,939 ahead</span></div>
+      <div class="prog-track"><div class="prog-fill" style="width:100%;background:#1e7a48">$105,564 of $93,625</div></div>
+    </div><div class="prog-wrap">
+      <div class="prog-head"><span>Year 6</span><span style="color:#1e7a48">100% — $39,757 ahead</span></div>
+      <div class="prog-track"><div class="prog-fill" style="width:100%;background:#1e7a48">$133,382 of $93,625</div></div>
+    </div><div class="prog-wrap">
+      <div class="prog-head"><span>Year 7</span><span style="color:#1e7a48">100% — $68,825 ahead</span></div>
+      <div class="prog-track"><div class="prog-fill" style="width:100%;background:#1e7a48">$162,450 of $93,625</div></div>
+    </div><div class="prog-wrap">
+      <div class="prog-head"><span>Year 8</span><span style="color:#1e7a48">100% — $99,180 ahead</span></div>
+      <div class="prog-track"><div class="prog-fill" style="width:100%;background:#1e7a48">$192,805 of $93,625</div></div>
+    </div><div class="prog-wrap">
+      <div class="prog-head"><span>Year 9</span><span style="color:#1e7a48">100% — $130,860 ahead</span></div>
+      <div class="prog-track"><div class="prog-fill" style="width:100%;background:#1e7a48">$224,485 of $93,625</div></div>
+    </div><div class="prog-wrap">
+      <div class="prog-head"><span>Year 10</span><span style="color:#1e7a48">100% — $163,903 ahead</span></div>
+      <div class="prog-track"><div class="prog-fill" style="width:100%;background:#1e7a48">$257,528 of $93,625</div></div>
+    </div></div>
+        <div style="overflow-x:auto;margin-top:16px">
+          <table class="yr-table">
+            <thead><tr>
+              <th style="text-align:left">Year</th><th>Gross rent</th><th>Hold cost</th><th>CapEx</th><th>Net cash flow</th><th>Cumulative</th><th>Still owed</th>
+            </tr></thead>
+            <tbody id="yr-body"><tr class="">
+      <td>Year 1</td>
+      <td class="pos">$57,260</td>
+      <td class="neg">($35,172)</td>
+      <td class="neg">($16,000)</td>
+      <td class="pos">$6,088</td>
+      <td class="neg">($87,537)</td>
+      <td class="neg">$87,537</td>
+    </tr><tr class="">
+      <td>Year 2</td>
+      <td class="pos">$58,691</td>
+      <td class="neg">($35,524)</td>
+      <td class="">-</td>
+      <td class="pos">$23,167</td>
+      <td class="neg">($64,370)</td>
+      <td class="neg">$64,370</td>
+    </tr><tr class="">
+      <td>Year 3</td>
+      <td class="pos">$60,159</td>
+      <td class="neg">($35,879)</td>
+      <td class="">-</td>
+      <td class="pos">$24,280</td>
+      <td class="neg">($40,090)</td>
+      <td class="neg">$40,090</td>
+    </tr><tr class="">
+      <td>Year 4</td>
+      <td class="pos">$61,663</td>
+      <td class="neg">($36,238)</td>
+      <td class="">-</td>
+      <td class="pos">$25,425</td>
+      <td class="neg">($14,665)</td>
+      <td class="neg">$14,665</td>
+    </tr><tr class="payback">
+      <td>★ Year 5 — PAID BACK</td>
+      <td class="pos">$63,204</td>
+      <td class="neg">($36,600)</td>
+      <td class="">-</td>
+      <td class="pos">$26,604</td>
+      <td class="pos">$11,939</td>
+      <td class="pos">-</td>
+    </tr><tr class="">
+      <td>Year 6</td>
+      <td class="pos">$64,784</td>
+      <td class="neg">($36,966)</td>
+      <td class="">-</td>
+      <td class="pos">$27,818</td>
+      <td class="pos">$39,757</td>
+      <td class="pos">-</td>
+    </tr><tr class="">
+      <td>Year 7</td>
+      <td class="pos">$66,404</td>
+      <td class="neg">($37,336)</td>
+      <td class="">-</td>
+      <td class="pos">$29,068</td>
+      <td class="pos">$68,825</td>
+      <td class="pos">-</td>
+    </tr><tr class="">
+      <td>Year 8</td>
+      <td class="pos">$68,064</td>
+      <td class="neg">($37,709)</td>
+      <td class="">-</td>
+      <td class="pos">$30,355</td>
+      <td class="pos">$99,180</td>
+      <td class="pos">-</td>
+    </tr><tr class="">
+      <td>Year 9</td>
+      <td class="pos">$69,766</td>
+      <td class="neg">($38,086)</td>
+      <td class="">-</td>
+      <td class="pos">$31,680</td>
+      <td class="pos">$130,860</td>
+      <td class="pos">-</td>
+    </tr><tr class="">
+      <td>Year 10</td>
+      <td class="pos">$71,510</td>
+      <td class="neg">($38,467)</td>
+      <td class="">-</td>
+      <td class="pos">$33,043</td>
+      <td class="pos">$163,903</td>
+      <td class="pos">-</td>
+    </tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALENDAR -->
+  <div class="panel" id="panel-calendar">
+    <div class="card card-last">
+      <div class="cal-nav">
+        <div class="cal-arrows">
+          <button class="cal-arr" onclick="prevMonth()">‹</button>
+          <button class="cal-arr" style="font-size:.78rem;width:auto;padding:0 10px" onclick="goToday()">Today</button>
+          <button class="cal-arr" onclick="nextMonth()">›</button>
+        </div>
+        <div class="cal-month" id="cal-month">April 2026</div>
+        <div style="display:flex;gap:6px">
+          <button class="tbtn tbtn-ghost" style="font-size:.78rem;padding:5px 10px" onclick="openModal(null,&#39;rental&#39;)">+ Rental</button>
+          <button class="tbtn tbtn-ghost" style="font-size:.78rem;padding:5px 10px" onclick="openModal(null,&#39;personal&#39;)">+ Personal</button>
+          <button class="tbtn tbtn-ghost" style="font-size:.78rem;padding:5px 10px" onclick="openModal(null,&#39;show&#39;)">+ Convention</button>
+          <button class="tbtn tbtn-ghost" style="font-size:.78rem;padding:5px 10px" onclick="openModal(null,&#39;reno&#39;)">+ Renovation</button>
+        </div>
+      </div>
+      <div class="cal-grid" id="cal-grid">
+        <div class="cal-dh">Sun</div><div class="cal-dh">Mon</div><div class="cal-dh">Tue</div>
+        <div class="cal-dh">Wed</div><div class="cal-dh">Thu</div><div class="cal-dh">Fri</div><div class="cal-dh">Sat</div>
+      <div class="cal-dc other"><div class="cal-dn">29</div></div><div class="cal-dc other"><div class="cal-dn">30</div></div><div class="cal-dc other"><div class="cal-dn">31</div></div><div class="cal-dc"><div class="cal-dn">1</div><div class="cal-rate rate-off">$175</div></div><div class="cal-dc"><div class="cal-dn">2</div><div class="cal-rate rate-off">$175</div></div><div class="cal-dc"><div class="cal-dn">3</div><div class="cal-rate rate-off">$210</div></div><div class="cal-dc"><div class="cal-dn">4</div><div class="cal-rate rate-off">$210</div></div><div class="cal-dc"><div class="cal-dn">5</div><div class="cal-rate rate-off">$175</div></div><div class="cal-dc"><div class="cal-dn">6</div><div class="cal-rate rate-off">$175</div></div><div class="cal-dc"><div class="cal-dn">7</div><div class="cal-rate rate-off">$175</div></div><div class="cal-dc"><div class="cal-dn">8</div><div class="cal-rate rate-off">$175</div></div><div class="cal-dc"><div class="cal-dn">9</div><div class="cal-rate rate-off">$175</div></div><div class="cal-dc"><div class="cal-dn">10</div><div class="cal-rate rate-off">$210</div></div><div class="cal-dc"><div class="cal-dn">11</div><div class="cal-rate rate-off">$210</div></div><div class="cal-dc"><div class="cal-dn">12</div><div class="cal-rate rate-off">$175</div></div><div class="cal-dc"><div class="cal-dn">13</div><div class="cal-rate rate-off">$175</div></div><div class="cal-dc"><div class="cal-dn">14</div><div class="cal-rate rate-off">$175</div></div><div class="cal-dc"><div class="cal-dn">15</div><div class="cal-rate rate-off">$175</div></div><div class="cal-dc"><div class="cal-dn">16</div><div class="cal-rate rate-off">$175</div></div><div class="cal-dc today"><div class="cal-dn">17</div><div class="cal-rate rate-off">$210</div></div><div class="cal-dc"><div class="cal-dn">18</div><span class="cal-ev ev-rental">Business Traveler</span></div><div class="cal-dc"><div class="cal-dn">19</div><span class="cal-ev ev-rental">Business Traveler</span></div><div class="cal-dc"><div class="cal-dn">20</div><span class="cal-ev ev-rental">Business Traveler</span></div><div class="cal-dc"><div class="cal-dn">21</div><span class="cal-ev ev-rental">Business Traveler</span></div><div class="cal-dc"><div class="cal-dn">22</div><span class="cal-ev ev-rental">Business Traveler</span></div><div class="cal-dc" style="background: rgba(234, 243, 222, 0.4);"><div class="cal-dn">23</div><span class="cal-ev ev-rental">Business Traveler</span><span class="cal-ev ev-show">Springfest</span></div><div class="cal-dc" style="background: rgba(234, 243, 222, 0.4);"><div class="cal-dn">24</div><span class="cal-ev ev-show">Springfest</span></div><div class="cal-dc" style="background: rgba(234, 243, 222, 0.4);"><div class="cal-dn">25</div><span class="cal-ev ev-show">Springfest</span></div><div class="cal-dc" style="background: rgba(234, 243, 222, 0.4);"><div class="cal-dn">26</div><div class="cal-rate rate-peak">$450</div></div><div class="cal-dc" style="background: rgba(234, 243, 222, 0.4);"><div class="cal-dn">27</div><div class="cal-rate rate-peak">$450</div></div><div class="cal-dc" style="background: rgba(234, 243, 222, 0.4);"><div class="cal-dn">28</div><div class="cal-rate rate-peak">$450</div></div><div class="cal-dc" style="background: rgba(234, 243, 222, 0.4);"><div class="cal-dn">29</div><div class="cal-rate rate-peak">$450</div></div><div class="cal-dc"><div class="cal-dn">30</div><div class="cal-rate rate-off">$175</div></div><div class="cal-dc other"><div class="cal-dn">1</div><span class="cal-ev ev-show">Cruisin' OC</span><span class="cal-ev ev-rental">Cruisin' OC Weekend</span></div><div class="cal-dc other"><div class="cal-dn">2</div><span class="cal-ev ev-show">Cruisin' OC</span><span class="cal-ev ev-rental">Cruisin' OC Weekend</span></div><div class="cal-dc other"><div class="cal-dn">3</div><span class="cal-ev ev-show">Cruisin' OC</span><span class="cal-ev ev-rental">Cruisin' OC Weekend</span></div><div class="cal-dc other"><div class="cal-dn">4</div></div><div class="cal-dc other"><div class="cal-dn">5</div></div><div class="cal-dc other"><div class="cal-dn">6</div></div><div class="cal-dc other"><div class="cal-dn">7</div></div><div class="cal-dc other"><div class="cal-dn">8</div></div><div class="cal-dc other"><div class="cal-dn">9</div></div></div>
+      <div class="cal-legend">
+        <div class="leg"><div class="leg-sq" style="background:#1a73e8"></div>Rental</div>
+        <div class="leg"><div class="leg-sq" style="background:#8B5CF6"></div>Personal</div>
+        <div class="leg"><div class="leg-sq" style="background:#b8860b"></div>Convention</div>
+        <div class="leg"><div class="leg-sq" style="background:#5F5E5A"></div>Renovation</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOOKINGS -->
+  <div class="panel active" id="panel-bookings">
+    <div class="card card-last">
+      <div class="card-head"><h3>All bookings</h3><span class="card-action" onclick="openModal(null,&#39;rental&#39;)">+ Add booking</span></div>
+      <div class="card-body" id="bk-list"><div class="bk-item"><div class="bk-dot" style="background:#1a73e8"></div>
+      <div class="bk-info"><div class="bk-name">Business Traveler</div><div class="bk-meta">Apr 18, 2026 → Apr 24, 2026 · 6 nights · Airbnb</div></div>
+      <div class="bk-right"><div class="bk-amt">$1,320</div><span class="bk-badge badge-confirmed">Rental booking</span></div></div><div class="bk-item"><div class="bk-dot" style="background:#b8860b"></div>
+      <div class="bk-info"><div class="bk-name">Springfest</div><div class="bk-meta">Apr 23, 2026 → Apr 26, 2026 · 3 nights · Direct</div></div>
+      <div class="bk-right"><div class="bk-amt">$1,350</div><span class="bk-badge badge-pending">Convention / trade show</span></div></div><div class="bk-item"><div class="bk-dot" style="background:#b8860b"></div>
+      <div class="bk-info"><div class="bk-name">Cruisin' OC</div><div class="bk-meta">May 1, 2026 → May 4, 2026 · 3 nights · VRBO</div></div>
+      <div class="bk-right"><div class="bk-amt">$1,560</div><span class="bk-badge badge-pending">Convention / trade show</span></div></div><div class="bk-item"><div class="bk-dot" style="background:#1a73e8"></div>
+      <div class="bk-info"><div class="bk-name">Cruisin' OC Weekend</div><div class="bk-meta">May 1, 2026 → May 4, 2026 · 3 nights · VRBO</div></div>
+      <div class="bk-right"><div class="bk-amt">$1,560</div><span class="bk-badge badge-confirmed">Rental booking</span></div></div><div class="bk-item"><div class="bk-dot" style="background:#5F5E5A"></div>
+      <div class="bk-info"><div class="bk-name">Kitchen Renovation</div><div class="bk-meta">May 15, 2026 → May 18, 2026 · 3 nights </div></div>
+      <div class="bk-right"><div class="bk-amt">—</div><span class="bk-badge badge-blocked">Renovation</span></div></div><div class="bk-item"><div class="bk-dot" style="background:#8B5CF6"></div>
+      <div class="bk-info"><div class="bk-name">Family Stay — Canceled Airbnb</div><div class="bk-meta">Jul 7, 2026 → Jul 14, 2026 · 7 nights </div></div>
+      <div class="bk-right"><div class="bk-amt">—</div><span class="bk-badge badge-personal">Personal use</span></div></div><div class="bk-item"><div class="bk-dot" style="background:#1a73e8"></div>
+      <div class="bk-info"><div class="bk-name">Peak Summer Booking</div><div class="bk-meta">Aug 2, 2026 → Aug 9, 2026 · 7 nights · VRBO</div></div>
+      <div class="bk-right"><div class="bk-amt">$3,430</div><span class="bk-badge badge-confirmed">Rental booking</span></div></div></div>
+    </div>
+  </div>
+
+  <!-- SMART LOCK -->
+  <div class="panel" id="panel-lock">
+    <div class="grid-2">
+      <div class="card card-last">
+        <div class="card-head"><h3>Smart Lock — Unit 1030B</h3><span class="lock-live">Connected</span></div>
+        <div class="card-body">
+          <div class="lock-grid">
+            <div class="code-box">
+              <div class="code-lbl">Current guest code</div>
+              <div class="code-val" id="guest-code">4 8 1 9</div>
+              <div class="code-exp">Expires Apr 24 · 11am checkout</div>
+            </div>
+            <div class="code-box">
+              <div class="code-lbl">Owner code</div>
+              <div class="code-val" id="owner-code" style="letter-spacing:.08em;cursor:pointer" onclick="toggleOwner()">● ● ● ●</div>
+              <div class="code-exp">Tap to reveal</div>
+            </div>
+          </div>
+          <div class="lock-btns">
+            <button class="lock-btn" onclick="genCode()">Generate new code</button>
+            <button class="lock-btn" onclick="revokeCode()">Revoke access</button>
+            <button class="lock-btn" onclick="lockLog()">Access log</button>
+          </div>
+        </div>
+      </div>
+      <div class="card card-last">
+        <div class="card-head"><h3>Recent access log</h3></div>
+        <div class="card-body">
+          <div class="result-stack" style="font-size:.82rem">
+            <div class="rrow"><span class="rlbl" style="font-family:monospace">Apr 17 · 3:42pm</span><span class="rval green">Guest 4819 · UNLOCKED</span></div>
+            <div class="rrow"><span class="rlbl" style="font-family:monospace">Apr 17 · 9:18am</span><span class="rval">Guest 4819 · LOCKED</span></div>
+            <div class="rrow"><span class="rlbl" style="font-family:monospace">Apr 16 · 11:54pm</span><span class="rval green">Guest 4819 · UNLOCKED</span></div>
+            <div class="rrow"><span class="rlbl" style="font-family:monospace">Apr 16 · 8:30am</span><span class="rval">Owner code · LOCKED</span></div>
+            <div class="rrow"><span class="rlbl" style="font-family:monospace">Apr 15 · 4:05pm</span><span class="rval green">Guest 4819 · UNLOCKED</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VACASA COMPARE -->
+  <div class="panel" id="panel-compare">
+    <div class="card">
+      <div class="card-head"><h3>Vacasa vs APG — same unit, different management</h3></div>
+      <div class="card-body">
+        <div class="vc-grid">
+          <div class="vc-card vc-bad">
+            <div class="vc-head">Vacasa 2022–2025 actual</div>
+            <div class="vc-val">$12,437/yr</div>
+            <div class="vc-sub">Average net to owner over 4 years<br>Peaked $18,704 in 2022<br>Cratered to $8,213 in 2024<br>13% occupancy at lowest<br>16% management fee every booking<br>No convention pricing whatsoever<br>Deferred maintenance → bad reviews</div>
+          </div>
+          <div class="vc-card vc-mid">
+            <div class="vc-head">APG Year 1 — base case</div>
+            <div class="vc-val" id="vc-yr1">$6,088</div>
+            <div class="vc-sub">After $16K renovation hit<br>Self-managed, zero Vacasa fee<br>Basic Airbnb + VRBO listing<br>Convention weeks priced properly<br>Fresh listing, new photos post-reno<br>Matches Scott's model at $66K gross<br>Cash-on-cash positive from day 1</div>
+          </div>
+          <div class="vc-card vc-good">
+            <div class="vc-head">APG Year 2+ — full platform</div>
+            <div class="vc-val" id="vc-yr2">$22,088</div>
+            <div class="vc-sub">Renovation done, no CapEx drag<br>Direct bookings via APGRentals.com<br>tradeshows.fyi event pricing<br>APG Exhibits cross-promotion<br>Doug's automation fully live<br>40%+ direct booking target<br>Path to $27–35K by Year 3</div>
+          </div>
+        </div>
+        <div style="margin-top:20px">
+          <div class="card-head" style="padding:0 0 12px;border-bottom:1px solid var(--border);margin-bottom:14px"><h3 style="font-size:.9rem">Year-by-year comparison</h3></div>
+          <div class="chart-wrap" style="height:240px">
+            <canvas id="compareChart" role="img" aria-label="Bar chart comparing Vacasa actual vs APG projected revenue 2022 to 2028">Vacasa declined from $18,704 to $8,213. APG projects $5,608 Year 1 growing to $35,000 by Year 3.</canvas>
+          </div>
+          <div style="display:flex;gap:16px;margin-top:10px;font-size:.78rem;color:var(--ink3)">
+            <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#c0392b"></span>Vacasa actual proceeds</span>
+            <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:#1e7a48"></span>APG projected net profit</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </div><!-- end content -->
+</main>
+</div>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modal-bg" onclick="handleModalBgClick(event)">
+  <div class="modal">
+    <h3 id="modal-title">Add booking</h3>
+    <div class="form-row"><label>Type</label>
+      <select id="m-type" onchange="modalTypeChange()">
+        <option value="rental">Rental booking</option>
+        <option value="personal">Personal use</option>
+        <option value="show">Convention / trade show</option>
+        <option value="reno">Renovation / maintenance</option>
+      </select>
+    </div>
+    <div class="form-row" id="mf-label"><label>Guest / label</label><input type="text" id="m-label" placeholder="e.g. Smith Family"></div>
+    <div class="form-row"><label>Start date</label><input type="date" id="m-start"></div>
+    <div class="form-row"><label>End date</label><input type="date" id="m-end"></div>
+    <div class="form-row" id="mf-rate"><label>Rate / night ($)</label><input type="number" id="m-rate" placeholder="210"></div>
+    <div class="form-row" id="mf-source"><label>Platform</label>
+      <select id="m-source"><option>Direct</option><option>Airbnb</option><option>VRBO</option><option>Convention referral</option></select>
+    </div>
+    <div class="modal-btns">
+      <button class="mbtn mbtn-del" id="m-del-btn" style="display:none;margin-right:auto" onclick="deleteBooking()">Delete</button>
+      <button class="mbtn mbtn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="mbtn mbtn-save" onclick="saveBooking()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────
+let bookings = [
+  {id:1,type:'rental',label:'Business Traveler',start:'2026-04-18',end:'2026-04-24',rate:220,source:'Airbnb'},
+  {id:2,type:'show',label:'Springfest',start:'2026-04-23',end:'2026-04-26',rate:450,source:'Direct'},
+  {id:3,type:'show',label:"Cruisin' OC",start:'2026-05-01',end:'2026-05-04',rate:520,source:'VRBO'},
+  {id:4,type:'rental',label:"Cruisin' OC Weekend",start:'2026-05-01',end:'2026-05-04',rate:520,source:'VRBO'},
+  {id:5,type:'reno',label:'Kitchen Renovation',start:'2026-05-15',end:'2026-05-18',rate:0,source:''},
+  {id:6,type:'personal',label:'Family Stay — Canceled Airbnb',start:'2026-07-07',end:'2026-07-14',rate:0,source:''},
+  {id:7,type:'rental',label:'Peak Summer Booking',start:'2026-08-02',end:'2026-08-09',rate:490,source:'VRBO'},
+];
+let nextId=8;
+let editId=null;
+let calDate=new Date(2026,3,1);
+const typeColors={rental:'#1a73e8',personal:'#8B5CF6',show:'#b8860b',reno:'#5F5E5A'};
+const typeLabels={rental:'Rental booking',personal:'Personal use',show:'Convention / trade show',reno:'Renovation'};
+
+// ── HELPERS ──────────────────────────────────────────────────
+function toKey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function parseKey(k){const p=k.split('-');return new Date(+p[0],+p[1]-1,+p[2])}
+function fmt(k){return parseKey(k).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}
+function nights(s,e){return Math.max(0,Math.round((parseKey(e)-parseKey(s))/(864e5)))}
+function $c(id){return document.getElementById(id)}
+function cur(id){return +$c(id).value}
+
+// ── CALC ──────────────────────────────────────────────────────
+function calc(){
+  const price=cur('s-price'),down=cur('s-down')/100,rate=cur('s-rate')/10/100;
+  const hoa=cur('s-hoa'),convWks=cur('s-conv-wks'),convRate=cur('s-conv-rate');
+  const sumWks=cur('s-sum-wks'),sumRate=cur('s-sum-rate');
+  const offWks=cur('s-off-wks'),offRate=cur('s-off-rate');
+  const puWks=cur('s-pu'),reno=cur('s-reno');
+
+  $c('lv-price').textContent='$'+price.toLocaleString();
+  $c('lv-down').textContent=Math.round(down*100)+'%';
+  $c('lv-rate').textContent=(rate*100).toFixed(3).replace(/\.?0+$/,'')+'%';
+  $c('lv-hoa').textContent='$'+hoa;
+  $c('lv-conv-wks').textContent=convWks+' wks · $'+convRate;
+  $c('lv-conv-rate').textContent='$'+convRate;
+  $c('lv-sum-wks').textContent=sumWks+' wks · $'+sumRate;
+  $c('lv-sum-rate').textContent='$'+sumRate;
+  $c('lv-off-wks').textContent=offWks+' wks · $'+offRate;
+  $c('lv-off-rate').textContent='$'+offRate;
+  $c('lv-pu').textContent=puWks+' wks';
+  $c('lv-reno').textContent='$'+reno.toLocaleString();
+
+  const loan=price*(1-down);
+  const mo=rate/12;
+  const pmt=Math.round(loan*(mo*Math.pow(1+mo,360))/(Math.pow(1+mo,360)-1));
+  const annDebt=pmt*12;
+  const closing=Math.round(price*0.025);
+  const cashIn=Math.round(price*down)+closing+reno;
+  const annFixed=(pmt+hoa+Math.round(price*0.01/12)+375)*12;
+
+  const convRev=Math.round(convWks*7*convRate);
+  const sumRev=Math.round(sumWks*7*sumRate);
+  const offRev=Math.round(offWks*7*offRate);
+  const gross=convRev+sumRev+offRev;
+  const yr1=gross-annFixed-reno;
+  const yr2=gross-annFixed;
+  const coc=Math.round(yr2/cashIn*1000)/10;
+
+  // Update results
+  $c('r-price').textContent='$'+price.toLocaleString();
+  $c('r-down').textContent='$'+Math.round(price*down).toLocaleString();
+  $c('r-close').textContent='$'+closing.toLocaleString();
+  $c('r-reno').textContent='$'+reno.toLocaleString();
+  $c('r-cashin').textContent='$'+cashIn.toLocaleString();
+  $c('r-mort').textContent='$'+pmt.toLocaleString();
+  $c('r-hoa').textContent='$'+hoa;
+  $c('r-monthly').textContent='$'+Math.round(annFixed/12).toLocaleString();
+  $c('r-annual').textContent='$'+annFixed.toLocaleString();
+  $c('r-conv-rev').textContent='$'+convRev.toLocaleString();
+  $c('r-sum-rev').textContent='$'+sumRev.toLocaleString();
+  $c('r-off-rev').textContent='$'+offRev.toLocaleString();
+  $c('r-gross').textContent='$'+gross.toLocaleString();
+  $c('r-less-fixed').textContent='$'+annFixed.toLocaleString();
+  $c('r-less-reno').textContent='$'+reno.toLocaleString();
+  $c('r-yr1-profit').textContent=(yr1>=0?'$':'−$')+Math.abs(yr1).toLocaleString();
+  $c('r-yr1-profit').className='rval '+(yr1>=0?'green':'red');
+  $c('r-yr2-profit').textContent='$'+yr2.toLocaleString();
+  $c('r-coc').textContent=coc.toFixed(1)+'%';
+  $c('r-coc').className='rval '+(coc>=15?'green':coc>=8?'amber':'red');
+
+  // Payback table
+  const tbody=$c('yr-body');
+  tbody.innerHTML='';
+  let cum=-cashIn;
+  let paybackYr=null;
+  for(let y=1;y<=10;y++){
+    const gr=Math.round(gross*Math.pow(1.025,y-1));
+    const hc=Math.round(annFixed*Math.pow(1.01,y-1));
+    const cx=y===1?reno:0;
+    const ncf=gr-hc-cx;
+    cum+=ncf;
+    if(cum>=0&&!paybackYr)paybackYr=y;
+    const isPb=paybackYr&&y===paybackYr;
+    tbody.innerHTML+=`<tr class="${isPb?'payback':''}">
+      <td>${isPb?'★ ':''}Year ${y}${isPb?' — PAID BACK':''}</td>
+      <td class="pos">$${gr.toLocaleString()}</td>
+      <td class="neg">($${hc.toLocaleString()})</td>
+      <td class="${cx>0?'neg':''}">${cx>0?'($'+cx.toLocaleString()+')':'-'}</td>
+      <td class="${ncf>=0?'pos':'neg'}">${ncf>=0?'$'+ncf.toLocaleString():'($'+Math.abs(ncf).toLocaleString()+')'}</td>
+      <td class="${cum>=0?'pos':'neg'}">${cum>=0?'$'+cum.toLocaleString():'($'+Math.abs(cum).toLocaleString()+')'}</td>
+      <td class="${cum<0?'neg':'pos'}">${cum<0?'$'+Math.abs(cum).toLocaleString():'-'}</td>
+    </tr>`;
+  }
+  $c('r-payback').textContent=paybackYr?'Year '+paybackYr:'Yr 10+';
+
+  // Progress bars
+  $c('pb-cashin-label').textContent=cashIn.toLocaleString();
+  const bars=$c('pb-bars');
+  bars.innerHTML='';
+  let cum2=-cashIn;
+  [1,2,3,4,5,6,7,8,9,10].forEach(y=>{
+    const gr=Math.round(gross*Math.pow(1.025,y-1));
+    const hc=Math.round(annFixed*Math.pow(1.01,y-1));
+    const cx=y===1?reno:0;
+    cum2+=gr-hc-cx;
+    const pct=Math.min(100,Math.max(0,Math.round((cashIn+cum2)/cashIn*100)));
+    const col=pct>=100?'#1e7a48':pct>=60?'#1e8a96':pct>=30?'#b8860b':'#c0392b';
+    bars.innerHTML+=`<div class="prog-wrap">
+      <div class="prog-head"><span>Year ${y}</span><span style="color:${col}">${pct}% — ${cum2>=0?'$'+cum2.toLocaleString()+' ahead':'$'+Math.abs(cum2).toLocaleString()+' to recover'}</span></div>
+      <div class="prog-track"><div class="prog-fill" style="width:${pct}%;background:${col}">${pct>=20?'$'+(cashIn+cum2).toLocaleString()+' of $'+cashIn.toLocaleString():''}</div></div>
+    </div>`;
+  });
+
+  // Update dashboard stats
+  $c('dash-rev').textContent='$'+gross.toLocaleString();
+  $c('dash-profit').textContent='$'+yr2.toLocaleString();
+  $c('dash-monthly').textContent='$'+Math.round(annFixed/12).toLocaleString();
+  $c('dash-coc').textContent=coc.toFixed(1)+'%';
+  $c('vc-yr1').textContent=(yr1>=0?'$':'−$')+Math.abs(yr1).toLocaleString();
+  $c('vc-yr2').textContent='$'+yr2.toLocaleString();
+}
+
+// ── CALENDAR ──────────────────────────────────────────────────
+function renderCal(){
+  const grid=$c('cal-grid');
+  grid.querySelectorAll('.cal-dc').forEach(c=>c.remove());
+  const y=calDate.getFullYear(),m=calDate.getMonth();
+  $c('cal-month').textContent=calDate.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  const first=new Date(y,m,1);
+  const start=new Date(first);start.setDate(start.getDate()-first.getDay());
+  const todayKey=toKey(new Date());
+  const convWks=["2026-02-14","2026-04-23","2026-05-01","2026-06-13","2026-10-01"];
+
+  for(let i=0;i<42;i++){
+    const d=new Date(start);d.setDate(start.getDate()+i);
+    const k=toKey(d);
+    const isOther=d.getMonth()!==m;
+    const dow=d.getDay(),mo=d.getMonth();
+    let rateClass='rate-off',rate=180;
+    for(const s of convWks){const sd=new Date(s+'T00:00:00'),ed=new Date(sd);ed.setDate(ed.getDate()+7);if(d>=sd&&d<ed){rateClass='rate-peak';rate=450;break;}}
+    if(rateClass==='rate-off'&&mo>=5&&mo<=7){rateClass='rate-summer';rate=dow===5||dow===6?340:260;}
+    else if(rateClass==='rate-off'){rate=dow===5||dow===6?210:175;}
+
+    const dayBks=bookings.filter(b=>k>=b.start&&k<b.end);
+    const hasPersonal=dayBks.some(b=>b.type==='personal');
+
+    const dc=document.createElement('div');
+    dc.className='cal-dc'+(isOther?' other':'')+(k===todayKey?' today':'')+(hasPersonal?' has-personal':'');
+    if(!isOther&&rateClass==='rate-peak')dc.style.background='rgba(234,243,222,.4)';
+    else if(!isOther&&rateClass==='rate-summer')dc.style.background='rgba(230,241,251,.4)';
+
+    const dn=document.createElement('div');dn.className='cal-dn';dn.textContent=d.getDate();dc.appendChild(dn);
+    if(!isOther&&dayBks.length===0){
+      const r=document.createElement('div');r.className='cal-rate '+rateClass;r.textContent='$'+rate;dc.appendChild(r);
+    }
+    const shown=new Set();
+    dayBks.forEach(b=>{
+      if(!shown.has(b.id)){
+        shown.add(b.id);
+        const ev=document.createElement('span');ev.className='cal-ev ev-'+b.type;ev.textContent=b.label;dc.appendChild(ev);
+      }
+    });
+    dc.addEventListener('click',()=>{
+      if(isOther)return;
+      const bk=dayBks[0];
+      if(bk)openModal(bk.id,'edit');
+      else{const m=$c('m-start');m.value=k;const n=$c('m-end');n.value=k;openModal(null,'rental');}
+    });
+    grid.appendChild(dc);
+  }
+}
+function prevMonth(){calDate.setMonth(calDate.getMonth()-1);renderCal();}
+function nextMonth(){calDate.setMonth(calDate.getMonth()+1);renderCal();}
+function goToday(){calDate=new Date();calDate.setDate(1);renderCal();}
+
+// ── BOOKINGS LIST ──────────────────────────────────────────────
+function renderBookings(){
+  const list=$c('bk-list');
+  const sorted=[...bookings].sort((a,b)=>a.start<b.start?-1:1);
+  list.innerHTML='';
+  sorted.forEach(b=>{
+    const n=nights(b.start,b.end);
+    const rev=n*b.rate;
+    const badgeClass=b.type==='rental'?'badge-confirmed':b.type==='personal'?'badge-personal':b.type==='show'?'badge-pending':'badge-blocked';
+    const item=document.createElement('div');item.className='bk-item';
+    item.innerHTML=`<div class="bk-dot" style="background:${typeColors[b.type]}"></div>
+      <div class="bk-info"><div class="bk-name">${b.label}</div><div class="bk-meta">${fmt(b.start)} → ${fmt(b.end)} · ${n} night${n!==1?'s':''} ${b.source?'· '+b.source:''}</div></div>
+      <div class="bk-right"><div class="bk-amt">${rev>0?'$'+rev.toLocaleString():'—'}</div><span class="bk-badge ${badgeClass}">${typeLabels[b.type]}</span></div>`;
+    item.addEventListener('click',()=>openModal(b.id,'edit'));
+    list.appendChild(item);
+  });
+}
+
+// ── MODAL ──────────────────────────────────────────────────────
+function openModal(id,type){
+  editId=id;
+  const bg=$c('modal-bg');bg.classList.add('open');
+  const del=$c('m-del-btn');
+  if(id&&type==='edit'){
+    const b=bookings.find(x=>x.id===id);
+    $c('modal-title').textContent='Edit booking';
+    $c('m-type').value=b.type;
+    $c('m-label').value=b.label;
+    $c('m-start').value=b.start;
+    $c('m-end').value=b.end;
+    $c('m-rate').value=b.rate||'';
+    $c('m-source').value=b.source||'Direct';
+    del.style.display='block';
+  } else {
+    $c('modal-title').textContent='Add '+typeLabels[type||'rental'];
+    $c('m-type').value=type||'rental';
+    $c('m-label').value='';
+    if(!$c('m-start').value)$c('m-start').value='';
+    $c('m-end').value='';
+    $c('m-rate').value='';
+    $c('m-source').value='Direct';
+    del.style.display='none';
+  }
+  modalTypeChange();
+}
+function closeModal(){$c('modal-bg').classList.remove('open');editId=null;}
+function handleModalBgClick(e){if(e.target===$c('modal-bg'))closeModal();}
+function modalTypeChange(){
+  const t=$c('m-type').value;
+  $c('mf-rate').style.display=t==='rental'||t==='show'?'block':'none';
+  $c('mf-source').style.display=t==='rental'?'block':'none';
+}
+function saveBooking(){
+  const start=$c('m-start').value;
+  if(!start){alert('Please set a start date.');return;}
+  const bk={
+    id:editId||nextId++,
+    type:$c('m-type').value,
+    label:$c('m-label').value||typeLabels[$c('m-type').value],
+    start,end:$c('m-end').value||start,
+    rate:+$c('m-rate').value||0,
+    source:$c('m-source').value
+  };
+  if(editId){const i=bookings.findIndex(x=>x.id===editId);bookings[i]=bk;}
+  else bookings.push(bk);
+  closeModal();renderCal();renderBookings();
+}
+function deleteBooking(){
+  if(!editId)return;
+  bookings=bookings.filter(x=>x.id!==editId);
+  closeModal();renderCal();renderBookings();
+}
+
+// ── SMART LOCK ──────────────────────────────────────────────────
+let ownerRevealed=false;
+function toggleOwner(){
+  ownerRevealed=!ownerRevealed;
+  $c('owner-code').textContent=ownerRevealed?'7 3 2 1':'● ● ● ●';
+}
+function genCode(){
+  const code=Math.floor(1000+Math.random()*9000);
+  $c('guest-code').textContent=String(code).split('').join(' ');
+  alert('New guest code generated: '+code+'\n\nThis code has been set on the lock and will expire at the guest\'s checkout time. Send it to your guest via the booking confirmation.');
+}
+function revokeCode(){if(confirm('Revoke current guest code 4819?\nGuest will lose access immediately.')){$c('guest-code').textContent='— — — —';alert('Code revoked. Guest notified via email.');}}
+function lockLog(){alert('Full access log:\n\nApr 17 · 3:42pm · Guest 4819 · UNLOCKED\nApr 17 · 9:18am · Guest 4819 · LOCKED\nApr 16 · 11:54pm · Guest 4819 · UNLOCKED\nApr 16 · 8:30am · Owner code · LOCKED\nApr 15 · 4:05pm · Guest 4819 · UNLOCKED');}
+
+// ── NAVIGATION ──────────────────────────────────────────────────
+const panelTitles={dashboard:'Dashboard — Thunder Island #1030B',model:'Financial Model',calendar:'Booking Calendar',bookings:'All Bookings',lock:'Smart Lock',compare:'Vacasa vs APG'};
+function showPanel(name){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+  $c('panel-'+name).classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(i=>{if(i.textContent.trim().toLowerCase().includes(name.substring(0,4).toLowerCase()))i.classList.add('active');});
+  $c('topbar-title').textContent=panelTitles[name]||name;
+  if(name==='calendar')renderCal();
+  if(name==='bookings')renderBookings();
+  if(name==='compare')buildCompareChart();
+}
+
+// ── CHARTS ──────────────────────────────────────────────────────
+let revChartInst=null,compareChartInst=null,compareBuilt=false;
+
+function buildRevChart(){
+  const ctx=$c('revChart');
+  if(revChartInst)revChartInst.destroy();
+  revChartInst=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+      datasets:[{
+        label:'Revenue',
+        data:[800,2200,1800,4200,6800,7200,9400,9100,5200,4400,1400,900],
+        backgroundColor:['#b5d4f4','#b5d4f4','#b5d4f4','#378ADD','#639922','#639922','#1e7a48','#1e7a48','#639922','#378ADD','#b5d4f4','#b5d4f4'],
+        borderRadius:4
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        y:{ticks:{callback:v=>'$'+Math.round(v/1000)+'k'},grid:{color:'rgba(0,0,0,.05)'}},
+        x:{ticks:{autoSkip:false},grid:{display:false}}
+      }
+    }
+  });
+}
+
+function buildCompareChart(){
+  if(compareBuilt)return;compareBuilt=true;
+  const ctx=$c('compareChart');
+  if(compareChartInst)compareChartInst.destroy();
+  compareChartInst=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:['2022','2023','2024','2025','2026 (Yr1)','2027 (Yr2)','2028 (Yr3)'],
+      datasets:[
+        {label:'Vacasa actual',data:[18704,11509,8213,11320,null,null,null],backgroundColor:'#c0392b',borderRadius:4},
+        {label:'APG projected',data:[null,null,null,null,5608,21608,28000],backgroundColor:'#1e7a48',borderRadius:4}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        y:{ticks:{callback:v=>'$'+Math.round(v/1000)+'k'},grid:{color:'rgba(0,0,0,.05)'},beginAtZero:true},
+        x:{ticks:{autoSkip:false},grid:{display:false}}
+      }
+    }
+  });
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+calc();
+renderBookings();
+setTimeout(buildRevChart,100);
+</script>
+
+
+</body></html>
